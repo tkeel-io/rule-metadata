@@ -1,0 +1,38 @@
+# This is a TOML document. Boom
+
+[Base]
+    ProfPathPrefix= "debug"
+    LogLevel= "debug"
+    ProfEnable= true
+    TracerEnable= true
+    WhiteList= [""]
+
+[Discovery]
+    endpoints = ["127.0.0.1:2379"]
+
+[RpcServer]
+    timeout = "1s"
+    addr = "127.0.0.1:10631"
+
+[Event]
+    Source = "qmq://127.0.0.1:2379/mdmp-event/metadata.v1"
+
+[etcd]
+    endpoints = ["127.0.0.1:2379"]
+
+[redis]
+    network = "tcp"
+    addr = "127.0.0.1:6379"
+    maxActive = 8
+    dialTimeout = "3s"
+    readTimeout = "1s"
+    writeTimeout = "1s"
+    idleTimeout = "120s"
+    poolTimeout = "30m"
+
+[Jaeger]
+    addr = "127.0.0.1:6831"
+
+[Slot]
+    PubSubSource = "qmq://127.0.0.1:2379/mdmp-topic/router.v0.0.2.prod"
+    PubSubSink = "qmq://127.0.0.1:2379/mdmp-queue/router.v0.0.2.prod"

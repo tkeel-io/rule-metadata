@@ -1,0 +1,41 @@
+# This is a TOML document. Boom
+
+[Base]
+    ProfPathPrefix= "debug"
+    LogLevel= "debug"
+    ProfEnable= false
+    TracerEnable= false
+    WhiteList= [""]
+    Endpoints= [":0"]
+
+[Discovery]
+    endpoints = ["tkeel-middleware-etcd:2379"]
+
+[RpcServer]
+    timeout = "1s"
+    addr = "0.0.0.0:10631"
+
+[Event]
+    Source = "kafka://tkeel-middleware-kafka:9092/mdmp-event/metadata.v1"
+
+[etcd]
+    endpoints = ["tkeel-middleware-etcd:2379"]
+
+[redis]
+    network = "tcp"
+    addr = "tkeel-middleware-redis-master:6379"
+    auth = "Biz0P8Xoup"
+    maxActive = 8
+    dialTimeout = "3s"
+    readTimeout = "1s"
+    writeTimeout = "1s"
+    idleTimeout = "120s"
+    poolTimeout = "30m"
+
+[Jaeger]
+    addr = "127.0.0.1:6831"
+
+[Slot]
+    PubSubSource = "kafka://tkeel-middleware-kafka:9092/mdmp-topic/router.v0.0.2.prod"
+    PubSubSink = "kafka://tkeel-middleware-kafka:9092/mdmp-queue/pipe.v0.0.2.prod"
+    RuleSource = "kafka://tkeel-middleware-kafka:9092/mdmp-topic/ruler.v0.0.2.prod"

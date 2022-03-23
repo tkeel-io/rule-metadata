@@ -1,0 +1,182 @@
+{
+  "version": "20200210",
+  "Sinks": {
+    "sink-mdmp-device-export": "qmq://127.0.0.1:2379/mdmp-device-export/group_id_router",
+    "sink-mdmp-device-queue": "qmq://127.0.0.1:2379/mdmp-device-queue/group_id_router",
+    "sink-mdmp-alarm-queue": "qmq://127.0.0.1:2379/mdmp-alarm-queue/group_id_router",
+    "sink-mdmp-metrics": "qmq://127.0.0.1:2379/mdmp-metrics/group_id_metrics",
+    "sink-mdmp-cloudsat": "qmq://127.0.0.1:2379/cloudsat/group_id_router"
+  },
+  "Entities": {
+    "clickHouseMonitor": {
+      "Sink": "sink-mdmp-device-queue",
+      "Type": "modeldata",
+      "Metadata": {
+        "option": {
+          "urls": [
+            "tcp://default@127.0.0.1:9000"
+          ],
+          "dbName": "iot_manage",
+          "table": "device_thing_data",
+          "etcd": "http://127.0.0.1:2379"
+        },
+        "fields": {}
+      }
+    },
+    "clickHouseAlarm": {
+      "Sink": "sink-mdmp-device-queue",
+      "Type": "modeldataEx",
+      "Metadata": {
+        "option": {
+          "urls": [
+            "tcp://default@127.0.0.1:9000"
+          ],
+          "dbName": "iot_manage",
+          "table": "device_event_data",
+          "etcd": "http://127.0.0.1:2379"
+        },
+        "fields": {
+          "message": "params.value",
+          "metadata": "params.meta",
+          "device_id": "params.meta.source_id"
+        }
+      }
+    },
+    "cloudsatAlarm": {
+      "Sink": "sink-mdmp-cloudsat",
+      "Type": "cloudsat",
+      "Metadata": {
+        "option": {
+          "Sink": "qmq://127.0.0.1:2379/custom_meter_data/?format=raw"
+        },
+        "field_map": {
+          "netOut": "raw",
+          "netIn": "raw",
+          "memUsage": "percent",
+          "diskUsage": "percent",
+          "cpuPercent": "percent"
+        },
+        "fields": {
+          "region": "default",
+          "namespace": "cn-dsgkidpn",
+          "source": "iot",
+          "user_id": "{{attr(user_id)}}",
+          "group_id": " ",
+          "resource_type": "edge",
+          "resource_id": "{{device_id}}",
+          "resource_name": "{{device_id}}",
+          "root_user_id": " "
+        },
+        "metric_nodes": {
+          "node1": "params"
+        },
+        "node1_fields": {
+          "meter": "{{index()}}",
+          "value_type": "{{valueType(index())}}",
+          "value": "{{value}}",
+          "time_stamp": "{{time}}"
+        }
+      }
+    },
+    "iot.device_manager.status": {
+      "Sink": "sink-mdmp-device-export",
+      "Type": "sqs",
+      "Metadata": {}
+    },
+    "iot.device_manager.property": {
+      "Sink": "sink-mdmp-device-export",
+      "Type": "sqs",
+      "Metadata": {}
+    },
+    "iot.device_manager.event": {
+      "Sink": "sink-mdmp-device-export",
+      "Type": "sqs",
+      "Metadata": {}
+    },
+    "eventAlarm": {
+      "Sink": "sink-mdmp-alarm-queue",
+      "Type": "sqs",
+      "Metadata": {}
+    },
+    "iot.device_manager.reply": {
+      "Sink": "sink-mdmp-device-export",
+      "Type": "sqs",
+      "Metadata": {}
+    },
+    "iot.metrics.device": {
+      "Sink": "sink-mdmp-metrics",
+      "Type": "sqs",
+      "Metadata": {}
+    },
+    "iot.metrics.ota": {
+      "Sink": "sink-mdmp-metrics",
+      "Type": "sqs",
+      "Metadata": {}
+    },
+    "iot.metrics.message": {
+      "Sink": "sink-mdmp-metrics",
+      "Type": "sqs",
+      "Metadata": {}
+    }
+  },
+  "Group": [
+    {
+      "UserId": "*",
+      "GroupId": "",
+      "Rules": [
+
+
+      ],
+        "rule001": {
+          "SQL": "select * from /sys/+/+/thing/event/property/post",
+          "Entities": [
+            "clickHouseMonitor"
+          ]
+        },
+        "rule002": {
+          "SQL": "select * from /sys/+/+/thing/property/+/post",
+          "Entities": [
+            "clickHouseMonitor"
+          ]
+        },
+        "rule003": {
+          "SQL": "select * from /sys/+/+/thing/event/+/post where params.time > 0",
+          "Entities": [
+            "clickHouseAlarm"
+          ]
+        },
+        "rule004": {
+          "SQL": "select *, userid() as user_id from /sys/+/+/thing/alarm/event/+/post",
+          "Entities": [
+            "eventAlarm"
+          ]
+        },
+        "rule005": {
+          "SQL": "select * from /sys/+/+/thing/event/property/monitor",
+          "Entities": [
+            "clickHouseMonitor"
+          ]
+        },
+        "rule006": {
+          "SQL": "select *, userid() as user_id, deviceid() as device_id from /sys/+/+/thing/event/property/monitor",
+          "Entities": [
+            "cloudsatAlarm"
+          ]
+        },
+        "rule007": {
+          "SQL": "select * from /sys/+/+/thing/service/+/call_reply",
+          "Entities": [
+            "iot.device_manager.reply"
+          ]
+        },
+        "rule008": {
+          "SQL": "select * from /as/mqtt/status/+/+",
+          "Entities": [
+            "iot.device_manager.status",
+            "iot.metrics.device"
+          ]
+        }
+      }
+    }
+  ]
+}

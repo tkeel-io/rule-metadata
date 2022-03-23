@@ -1,0 +1,14 @@
+{
+  "Version": "20200220",
+  "Services": {
+  },
+  "Resources": {
+    "*": {
+      "Rules": {},
+      "Routes": {
+
+
+      }
+    }
+  }
+}
