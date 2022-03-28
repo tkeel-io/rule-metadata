@@ -22,22 +22,23 @@ import (
 	"os"
 	"strings"
 
-	pb "github.com/tkeel-io/rule-util/metadata/v1"
-	"github.com/tkeel-io/rule-util/metadata/v1error"
-	"github.com/tkeel-io/rule-util/pkg/log"
-	logf "github.com/tkeel-io/rule-util/pkg/logfield"
-	"github.com/tkeel-io/rule-util/pkg/tracing"
 	"github.com/tkeel-io/rule-metadata/internal/conf"
 	"github.com/tkeel-io/rule-metadata/internal/endpoint/resource"
 	"github.com/tkeel-io/rule-metadata/internal/endpoint/rule"
+	xmetrics "github.com/tkeel-io/rule-metadata/internal/pkg/metrics"
 	"github.com/tkeel-io/rule-metadata/internal/repository"
 	"github.com/tkeel-io/rule-metadata/internal/repository/dao"
 	xgrpc "github.com/tkeel-io/rule-metadata/internal/transport/grpc"
 	"github.com/tkeel-io/rule-metadata/internal/utils"
 	"github.com/tkeel-io/rule-metadata/pkg/types"
-	"github.com/tkeel-io/rule-util/stream"
+	pb "github.com/tkeel-io/rule-util/metadata/v1"
+	"github.com/tkeel-io/rule-util/metadata/v1error"
+	"github.com/tkeel-io/rule-util/pkg/log"
+	logf "github.com/tkeel-io/rule-util/pkg/logfield"
 	"github.com/tkeel-io/rule-util/pkg/registry"
 	etcdv3 "github.com/tkeel-io/rule-util/pkg/registry/etcd3"
+	"github.com/tkeel-io/rule-util/pkg/tracing"
+	"github.com/tkeel-io/rule-util/stream"
 	"google.golang.org/grpc"
 )
 
@@ -123,10 +124,10 @@ func newServer(ctx context.Context, c *conf.Config, pt *patchTable, tracer traci
 		}
 
 	}
-	//	xmetrics.Init(c)
-	// xmetrics.GetIns().SetRule(srv.repo.CountRule(ctx))
-	//xmetrics.GetIns().SetRoute(srv.repo.CountRoute(ctx))
-	//xmetrics.GetIns().SetSubpub(srv.repo.CountPubsub(ctx))
+	xmetrics.Init(c)
+	xmetrics.GetIns().SetRule(srv.repo.CountRule(ctx))
+	xmetrics.GetIns().SetRoute(srv.repo.CountRoute(ctx))
+	xmetrics.GetIns().SetSubpub(srv.repo.CountPubsub(ctx))
 	return srv, nil
 }
 

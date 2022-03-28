@@ -15,7 +15,7 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
-	github.com/tkeel-io/rule-util v0.0.0-20220323031427-cb46652374e5
+	github.com/tkeel-io/rule-util v0.0.0-20220328140104-48b9cedb7c43
 	github.com/uber/jaeger-lib v2.4.1+incompatible
 	go.etcd.io/etcd/api/v3 v3.5.2
 	go.etcd.io/etcd/client/v3 v3.5.2
